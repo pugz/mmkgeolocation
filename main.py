@@ -121,7 +121,8 @@ def find_customer():
         # Get customer details
         customer_id = nearest_customer['Customer ID']  # Use "Customer ID" column
         customer_name = nearest_customer['Customer Name']
-        customer_address = f"{nearest_customer['Address']}, {nearest_customer['City']}, {nearest_customer['State']}"
+        # Combine 'Shipping Address', 'City', and 'Location' to form the full address
+        customer_address = f"{nearest_customer['Shipping Address']}, {nearest_customer['City']}, {nearest_customer['Location']}"
         distance_miles = nearest_customer['Distance']
 
         # Generate the custom link
