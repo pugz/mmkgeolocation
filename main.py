@@ -11,6 +11,10 @@ app = Flask(__name__)
 customers_co = pd.read_csv('CustomerDB-CO.csv')
 customers_il = pd.read_csv('CustomerDB-IL.csv')
 
+# Debugging: Print column names to ensure CustomerID exists
+print("CO Customer Columns:", customers_co.columns)
+print("IL Customer Columns:", customers_il.columns)
+
 # Geoapify API key
 GEOAPIFY_API_KEY = '2ca56f585d314b4faa0b4114d5c48a8c'
 
@@ -53,6 +57,10 @@ def find_nearest_customer(input_lat, input_lon, customers):
 
     # Find the customer with the minimum distance
     nearest_customer = customers.loc[customers['Distance'].idxmin()]
+
+    # Debugging: Print nearest customer details
+    print("Nearest Customer Details:", nearest_customer)
+    
     return nearest_customer
 
 # Function to geocode the address using Geoapify
@@ -95,6 +103,10 @@ def find_customer():
     # Combine CO and IL customers and remove rows with missing latitude/longitude
     all_customers = pd.concat([customers_co, customers_il])
     all_customers = all_customers.dropna(subset=['Latitude', 'Longitude'])
+
+    # Ensure 'CustomerID' column exists
+    if 'CustomerID' not in all_customers.columns:
+        return jsonify({'error': 'CustomerID column not found in customer data.'})
 
     # Find the nearest customer
     nearest_customer = find_nearest_customer(address_lat, address_lon, all_customers)
