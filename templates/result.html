@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nearest Customer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            margin: 10px 0;
+        }
+        a {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Nearest Customer Found</h1>
+        <p><strong>Entered Address:</strong> {{ entered_address }}</p>
+        <p><strong>Customer Name:</strong> {{ customer_name }}</p>
+        <p><strong>Customer Address:</strong> {{ customer_address }}</p>
+        <p><strong>Distance:</strong> {{ distance }}</p>
+        <p><a href="{{ link }}" target="_blank">View Customer</a></p>
+    </div>
+</body>
+</html>
