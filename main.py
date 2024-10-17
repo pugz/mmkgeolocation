@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, render_template, jsonify
 import pandas as pd
 import requests
@@ -52,4 +53,23 @@ def find_customer():
     address_lon = -73.935242  # Hardcoded longitude for now
 
     # Combine CO and IL customers
-    all_customers = pd.concat([customers_co
+    all_customers = pd.concat([customers_co, customers_il])
+
+    # Find the nearest customer
+    nearest_customer = find_nearest_customer(address_lat, address_lon, all_customers)
+
+    # Generate the custom link
+    customer_id = nearest_customer['CustomerID']
+    link_template = "https://mmkgroup.encompass8.com/Home?DashboardID=100100&TableName=Customers&SelectDisplayInParent=CustomerID%2CCompany%2CAddress%2CCity%2CCustomerTypeID%2CLocationID%2CAccountStatus&SubTableJoinID=Customers_TableTranslations%2CCustomersZones_Customers%2CSplitInvoices_Customers%2CServiceWindows_Customers&Parameters=F:CustomerID~V:999999~O:E|F:AccountStatus~V:Active^Inactive^OutOfBus~O:E"
+    custom_link = link_template.replace("999999", str(customer_id))
+
+    return jsonify({
+        'customer_id': int(customer_id),
+        'distance': nearest_customer['Distance'],
+        'link': custom_link
+    })
+
+if __name__ == '__main__':
+    # Bind to the dynamic port assigned by Render
+    port = int(os.environ.get('PORT', 5000))  # Default to port 5000 if not set
+    app.run(host='0.0.0.0', port=port)
