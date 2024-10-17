@@ -1,9 +1,9 @@
-import os
 from flask import Flask, request, render_template, jsonify
 import pandas as pd
 import requests
 from geopy.distance import geodesic
 from datetime import datetime
+import os
 
 app = Flask(__name__)
 
@@ -11,7 +11,10 @@ app = Flask(__name__)
 customers_co = pd.read_csv('CustomerDB-CO.csv')
 customers_il = pd.read_csv('CustomerDB-IL.csv')
 
-# Function to download CSV files
+# Geoapify API key
+GEOAPIFY_API_KEY = '2ca56f585d314b4faa0b4114d5c48a8c'
+
+# Function to download CSV files (if needed)
 def download_csv_files():
     today = datetime.now().date()
 
@@ -39,18 +42,37 @@ def find_nearest_customer(input_lat, input_lon, customers):
     nearest_customer = customers.loc[customers['Distance'].idxmin()]
     return nearest_customer
 
+# Function to geocode the address using Geoapify
+def geocode_address(address):
+    api_url = f"https://api.geoapify.com/v1/geocode/search?text={address}&apiKey={GEOAPIFY_API_KEY}"
+    response = requests.get(api_url).json()
+
+    if response['features']:
+        # Get latitude and longitude from the response
+        lat = response['features'][0]['properties']['lat']
+        lon = response['features'][0]['properties']['lon']
+        return lat, lon
+    return None, None
+
 @app.route('/')
 def home():
     return render_template('index.html')
 
 @app.route('/find_customer', methods=['POST'])
 def find_customer():
-    address = request.form['address']
+    # Get the separate fields from the form
+    street = request.form['street']
+    city = request.form['city']
+    state = request.form['state']
 
-    # For demonstration purposes, let's assume the lat/lon is already available
-    # Replace this section with a real geocoding API if necessary.
-    address_lat = 40.730610  # Hardcoded latitude for now
-    address_lon = -73.935242  # Hardcoded longitude for now
+    # Combine the fields into a full address string
+    address = f"{street}, {city}, {state}"
+
+    # Geocode the entered address using Geoapify
+    address_lat, address_lon = geocode_address(address)
+    
+    if address_lat is None or address_lon is None:
+        return jsonify({'error': 'Could not geocode the address. Please check the address and try again.'})
 
     # Combine CO and IL customers
     all_customers = pd.concat([customers_co, customers_il])
