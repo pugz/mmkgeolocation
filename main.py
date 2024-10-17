@@ -34,11 +34,24 @@ def download_csv_files():
 
 # Function to find nearest customer
 def find_nearest_customer(input_lat, input_lon, customers):
+    # Drop rows where Latitude or Longitude is missing
+    customers = customers.dropna(subset=['Latitude', 'Longitude'])
+
     def distance_from_input(row):
-        customer_loc = (row['Latitude'], row['Longitude'])
+        customer_lat = row['Latitude']
+        customer_lon = row['Longitude']
+        
+        # Check if latitude and longitude are valid numbers (not NaN or None)
+        if pd.isna(customer_lat) or pd.isna(customer_lon):
+            return float('inf')  # Return a large distance if coordinates are missing
+        
+        customer_loc = (customer_lat, customer_lon)
         return geodesic((input_lat, input_lon), customer_loc).miles
 
+    # Apply the distance calculation to valid rows only
     customers['Distance'] = customers.apply(distance_from_input, axis=1)
+
+    # Find the customer with the minimum distance
     nearest_customer = customers.loc[customers['Distance'].idxmin()]
     return nearest_customer
 
@@ -51,6 +64,11 @@ def geocode_address(address):
         # Get latitude and longitude from the response
         lat = response['features'][0]['properties']['lat']
         lon = response['features'][0]['properties']['lon']
+        
+        # Check if lat/lon are valid numbers
+        if lat is None or lon is None:
+            return None, None
+        
         return lat, lon
     return None, None
 
@@ -74,8 +92,9 @@ def find_customer():
     if address_lat is None or address_lon is None:
         return jsonify({'error': 'Could not geocode the address. Please check the address and try again.'})
 
-    # Combine CO and IL customers
+    # Combine CO and IL customers and remove rows with missing latitude/longitude
     all_customers = pd.concat([customers_co, customers_il])
+    all_customers = all_customers.dropna(subset=['Latitude', 'Longitude'])
 
     # Find the nearest customer
     nearest_customer = find_nearest_customer(address_lat, address_lon, all_customers)
