@@ -11,7 +11,7 @@ app = Flask(__name__)
 customers_co = pd.read_csv('CustomerDB-CO.csv')
 customers_il = pd.read_csv('CustomerDB-IL.csv')
 
-# Debugging: Print column names to ensure CustomerID exists
+# Debugging: Print column names to ensure "Customer ID" exists
 print("CO Customer Columns:", customers_co.columns)
 print("IL Customer Columns:", customers_il.columns)
 
@@ -104,15 +104,15 @@ def find_customer():
     all_customers = pd.concat([customers_co, customers_il])
     all_customers = all_customers.dropna(subset=['Latitude', 'Longitude'])
 
-    # Ensure 'CustomerID' column exists
-    if 'CustomerID' not in all_customers.columns:
-        return jsonify({'error': 'CustomerID column not found in customer data.'})
+    # Ensure 'Customer ID' column exists
+    if 'Customer ID' not in all_customers.columns:
+        return jsonify({'error': 'Customer ID column not found in customer data.'})
 
     # Find the nearest customer
     nearest_customer = find_nearest_customer(address_lat, address_lon, all_customers)
 
     # Generate the custom link
-    customer_id = nearest_customer['CustomerID']
+    customer_id = nearest_customer['Customer ID']  # Use "Customer ID" column
     link_template = "https://mmkgroup.encompass8.com/Home?DashboardID=100100&TableName=Customers&SelectDisplayInParent=CustomerID%2CCompany%2CAddress%2CCity%2CCustomerTypeID%2CLocationID%2CAccountStatus&SubTableJoinID=Customers_TableTranslations%2CCustomersZones_Customers%2CSplitInvoices_Customers%2CServiceWindows_Customers&Parameters=F:CustomerID~V:999999~O:E|F:AccountStatus~V:Active^Inactive^OutOfBus~O:E"
     custom_link = link_template.replace("999999", str(customer_id))
 
