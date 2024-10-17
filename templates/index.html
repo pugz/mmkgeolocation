@@ -8,8 +8,18 @@
 <body>
     <h1>Enter Address to Find Nearest Customer</h1>
     <form action="/find_customer" method="POST">
-        <label for="address">Enter Address:</label>
-        <input type="text" id="address" name="address" required>
+        <label for="street">Street:</label><br>
+        <input type="text" id="street" name="street" required><br><br>
+
+        <label for="city">City:</label><br>
+        <input type="text" id="city" name="city" required><br><br>
+
+        <label for="state">State:</label><br>
+        <select id="state" name="state" required>
+            <option value="IL" selected>Illinois (IL)</option>
+            <option value="CO">Colorado (CO)</option>
+        </select><br><br>
+
         <button type="submit">Find Nearest Customer</button>
     </form>
 </body>
