@@ -55,8 +55,14 @@ def find_nearest_customer(input_lat, input_lon, customers):
     # Apply the distance calculation to valid rows only
     customers['Distance'] = customers.apply(distance_from_input, axis=1)
 
-    # Find the customer with the minimum distance and select only the first one if there are ties
-    nearest_customer = customers.loc[customers['Distance'].idxmin()]
+    # Find the minimum distance
+    min_distance = customers['Distance'].min()
+
+    # Filter customers with the minimum distance
+    nearest_customers = customers[customers['Distance'] == min_distance]
+
+    # Return the customer with the lowest 'Customer ID' if there are ties
+    nearest_customer = nearest_customers.sort_values(by='Customer ID').iloc[0]
 
     # Debugging: Print nearest customer details
     print("Nearest Customer Details:", nearest_customer)
